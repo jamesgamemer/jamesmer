@@ -135,7 +135,7 @@
       });
 
       var html = '';
-      var catOrder = ['newbie', 'general', 'character', 'farming', 'advanced'];
+      var catOrder = Object.keys(categories);
 
       // If filter is not 'all', just show flat grid
       if (currentFilter !== 'all') {
