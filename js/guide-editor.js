@@ -882,13 +882,18 @@ var slug = createSlug(title);
 if(!slug){
 slug = 'guide-' + Date.now();
 }
-    var guideData = {
-      title: title,
-      slug: slug,
-      description: metaDescription.value.trim(),
-      cover_image: metaCoverUrl.value.trim(),
-      category: metaCategory.value,
-    };
+   var guideData = {
+
+  title: title,
+  description: metaDescription.value.trim(),
+  cover_image: metaCoverUrl.value.trim(),
+  category: metaCategory.value,
+
+};
+
+if(slug){
+  guideData.slug = slug;
+}
     // When auto-saving (status=null), don't change the current status
     if (status !== null) {
       guideData.status = status;
