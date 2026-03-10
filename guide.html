@@ -137,8 +137,11 @@
       contentArea.innerHTML = GuideRenderer.renderBlocks(blocks);
     }
 
-    loadGuide();
-  </script>
+  /* FIX: run after DOM ready */
+document.addEventListener("DOMContentLoaded", function () {
+  loadGuide();
+});
+</script>
 
 </body>
 </html>
