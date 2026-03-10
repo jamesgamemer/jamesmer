@@ -103,7 +103,7 @@
       }
 
       // Fetch guides
-  var guides = await GuideAPI.fetchAllGuides(isAdmin ? null : 'published');
+ var guides = await GuideAPI.fetchAllGuides();
 
 console.log("Guides fetched:", guides);
 
@@ -119,45 +119,66 @@ console.log("Guides fetched:", guides);
         return;
       }
 
-      renderGuides(guides);
+      renderGuides(guides, isAdmin);
     }
 
-    function renderGuides(guides) {
-      var container = document.getElementById('guidesContainer');
-      var filtered = currentFilter === 'all' ? guides : guides.filter(function(g) {
-        return (g.category || '').toLowerCase().trim() === currentFilter;
-      });
+  function renderGuides(guides, isAdmin) {
 
-      // Group by category
-      var categories = {};
-      filtered.forEach(function(g) {
-        var cat = (g.category || 'general').toLowerCase().trim();
-        if (!categories[cat]) categories[cat] = [];
-        categories[cat].push(g);
-      });
+  var container = document.getElementById('guidesContainer');
 
-      var html = '';
-      var catOrder = Object.keys(categories);
+  var published = guides.filter(function(g){
+    return g.status === 'published';
+  });
 
-      // If filter is not 'all', just show flat grid
-      if (currentFilter !== 'all') {
-        html += '<div class="guides-grid">';
-        filtered.forEach(function(g) {
-          html += renderGuideCard(g);
-        });
-        html += '</div>';
-      } else {
-        catOrder.forEach(function(cat) {
-          if (categories[cat] && categories[cat].length > 0) {
-            var catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
-            html += '<div class="guides-category-title">' + catLabel + ' Guides</div>';
-            html += '<div class="guides-grid">';
-            categories[cat].forEach(function(g) {
-              html += renderGuideCard(g);
-            });
-            html += '</div>';
-          }
-        });
+  var drafts = guides.filter(function(g){
+    return g.status === 'draft';
+  });
+
+  var html = '';
+
+  // ----------------
+  // Published
+  // ----------------
+
+  if (published.length > 0) {
+
+    html += '<div class="guides-category-title">Published Guides</div>';
+    html += '<div class="guides-grid">';
+
+    published.forEach(function(g){
+      html += renderGuideCard(g);
+    });
+
+    html += '</div>';
+  }
+
+  // ----------------
+  // Draft (admin only)
+  // ----------------
+
+  if (isAdmin && drafts.length > 0) {
+
+    html += '<div class="guides-category-title" style="margin-top:40px;">Draft Guides</div>';
+    html += '<div class="guides-grid">';
+
+    drafts.forEach(function(g){
+      html += renderGuideCard(g);
+    });
+
+    html += '</div>';
+  }
+
+  if (published.length === 0 && drafts.length === 0) {
+
+    html =
+      '<div class="guides-empty">' +
+        '<div class="guides-empty-icon">📚</div>' +
+        '<div class="guides-empty-text">No guides available yet.</div>' +
+      '</div>';
+  }
+
+  container.innerHTML = html;
+}
         // Any remaining categories
         Object.keys(categories).forEach(function(cat) {
           if (catOrder.indexOf(cat) === -1 && categories[cat].length > 0) {
