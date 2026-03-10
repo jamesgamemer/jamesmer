@@ -125,13 +125,13 @@ console.log("Guides fetched:", guides);
     function renderGuides(guides) {
       var container = document.getElementById('guidesContainer');
       var filtered = currentFilter === 'all' ? guides : guides.filter(function(g) {
-        return g.category === currentFilter;
+        return (g.category || '').toLowerCase().trim() === currentFilter;
       });
 
       // Group by category
       var categories = {};
       filtered.forEach(function(g) {
-        var cat = (g.category || 'general').toLowerCase();
+        var cat = (g.category || 'general').toLowerCase().trim();
         if (!categories[cat]) categories[cat] = [];
         categories[cat].push(g);
       });
