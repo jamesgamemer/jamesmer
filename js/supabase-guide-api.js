@@ -162,7 +162,17 @@ async function fetchAllGuides(statusFilter) {
     var ext = file.name.split('.').pop() || 'png';
     var timestamp = Date.now();
     var safeName = file.name.replace(/[^a-z0-9.]/gi, '_');
-    var filePath = 'guides/' + (guideId || 'general') + '/' + timestamp + '_' + safeName;
+    var mediaType = file.type.startsWith('video') ? 'video' : 'image';
+
+var filePath =
+ 'guides/' +
+ (guideId || 'general') +
+ '/' +
+ mediaType +
+ '/' +
+ timestamp +
+ '_' +
+ safeName;
 
     var uploadResult = await client.storage.from('guide-media').upload(filePath, file, {
       cacheControl: '3600',
