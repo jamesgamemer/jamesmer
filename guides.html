@@ -131,7 +131,7 @@ console.log("Guides fetched:", guides);
       // Group by category
       var categories = {};
       filtered.forEach(function(g) {
-        var cat = g.category || 'general';
+        var cat = (g.category || 'general').toLowerCase();
         if (!categories[cat]) categories[cat] = [];
         categories[cat].push(g);
       });
