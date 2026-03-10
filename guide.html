@@ -74,74 +74,98 @@
   <script src="js/i18n.js"></script>
   <script src="js/navbar.js?v=20260308"></script>
   <script>
-    if (typeof I18n !== 'undefined') { I18n.init(); I18n.applyTranslations(); }
+if (typeof I18n !== 'undefined') { 
+  I18n.init(); 
+  I18n.applyTranslations(); 
+}
 
-    var params = new URLSearchParams(window.location.search);
-    var slug = params.get('slug');
+var params = new URLSearchParams(window.location.search);
+var slug = params.get('slug');
 
-    async function loadGuide() {
-      if (!slug) {
-        document.getElementById('guideHeader').innerHTML = '<h1 class="guide-detail-title">Guide not found</h1>';
-        document.getElementById('guideContent').innerHTML = '<p style="color:var(--muted);">No guide slug provided.</p>';
-        return;
-      }
+async function loadGuide() {
 
-      var guide = await GuideAPI.fetchGuideBySlug(slug);
-      if (!guide) {
-        document.getElementById('guideHeader').innerHTML = '<h1 class="guide-detail-title">Guide not found</h1>';
-        document.getElementById('guideContent').innerHTML = '<p style="color:var(--muted);">The requested guide does not exist.</p>';
-        return;
-      }
+  var header = document.getElementById('guideHeader');
+  var contentArea = document.getElementById('guideContent');
 
-      // Update page title
-      document.title = guide.title + ' - 7DS Origin';
+  if (!header || !contentArea) return;
 
-      // Render header
-      var headerHtml = '';
-      if (guide.cover_image) {
-        headerHtml += '<img src="' + guide.cover_image + '" alt="" class="guide-detail-cover" onerror="this.style.display=\'none\'">';
-      }
-      headerHtml += '<div class="guide-detail-meta">';
-      headerHtml += '<span class="guide-detail-category">' + (guide.category || 'general') + '</span>';
-      headerHtml += '<span class="guide-detail-date">Updated: ' + new Date(guide.updated_at).toLocaleDateString() + '</span>';
-      headerHtml += '</div>';
-      headerHtml += '<h1 class="guide-detail-title">' + guide.title + '</h1>';
-      if (guide.description) {
-        headerHtml += '<p class="guide-detail-desc">' + guide.description + '</p>';
-      }
-      document.getElementById('guideHeader').innerHTML = headerHtml;
+  if (!slug) {
+    header.innerHTML = '<h1 class="guide-detail-title">Guide not found</h1>';
+    contentArea.innerHTML = '<p style="color:var(--muted);">No guide slug provided.</p>';
+    return;
+  }
 
-      // Check admin
-      var isAdmin = false;
-      try { isAdmin = await Auth.isLoggedIn(); } catch(e) {}
-      if (isAdmin) {
-        document.getElementById('guideAdminActions').style.display = 'block';
-        document.getElementById('editGuideBtn').href = 'guide-editor.html?id=' + guide.id;
-        document.getElementById('deleteGuideBtn').onclick = async function() {
-          if (!confirm('Are you sure you want to delete this guide?')) return;
-          await GuideAPI.deleteGuide(guide.id);
-          window.location.href = 'guides.html';
-        };
-      }
+  var guide = await GuideAPI.fetchGuideBySlug(slug);
 
-      // Load blocks
-      var blocks = await GuideAPI.fetchBlocks(guide.id);
-      var contentArea = document.getElementById('guideContent');
+  if (!guide) {
+    header.innerHTML = '<h1 class="guide-detail-title">Guide not found</h1>';
+    contentArea.innerHTML = '<p style="color:var(--muted);">The requested guide does not exist.</p>';
+    return;
+  }
 
-      if (!blocks || blocks.length === 0) {
-        contentArea.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px;">This guide has no content yet.</p>';
-        return;
-      }
+  // Update page title
+  document.title = guide.title + ' - 7DS Origin';
 
-      // Render blocks
-      contentArea.innerHTML = GuideRenderer.renderBlocks(blocks);
-    }
+  // Render header
+  var headerHtml = '';
 
-  /* FIX: run after DOM ready */
+  if (guide.cover_image) {
+    headerHtml += '<img src="' + guide.cover_image + '" class="guide-detail-cover" onerror="this.style.display=\'none\'">';
+  }
+
+  headerHtml += '<div class="guide-detail-meta">';
+  headerHtml += '<span class="guide-detail-category">' + (guide.category || 'general') + '</span>';
+  headerHtml += '<span class="guide-detail-date">Updated: ' + new Date(guide.updated_at).toLocaleDateString() + '</span>';
+  headerHtml += '</div>';
+
+  headerHtml += '<h1 class="guide-detail-title">' + guide.title + '</h1>';
+
+  if (guide.description) {
+    headerHtml += '<p class="guide-detail-desc">' + guide.description + '</p>';
+  }
+
+  header.innerHTML = headerHtml;
+
+  // Admin check
+  var isAdmin = false;
+  try { 
+    isAdmin = await Auth.isLoggedIn(); 
+  } catch(e) {}
+
+  if (isAdmin) {
+
+    document.getElementById('guideAdminActions').style.display = 'block';
+
+    document.getElementById('editGuideBtn').href =
+      'guide-editor.html?id=' + guide.id;
+
+    document.getElementById('deleteGuideBtn').onclick = async function () {
+
+      if (!confirm('Are you sure you want to delete this guide?')) return;
+
+      await GuideAPI.deleteGuide(guide.id);
+
+      window.location.href = 'guides.html';
+    };
+  }
+
+  // Load blocks
+  var blocks = await GuideAPI.fetchBlocks(guide.id);
+
+  if (!blocks || blocks.length === 0) {
+
+    contentArea.innerHTML =
+      '<p style="color:var(--muted);text-align:center;padding:40px;">This guide has no content yet.</p>';
+
+    return;
+  }
+
+  // Render blocks
+  contentArea.innerHTML = GuideRenderer.renderBlocks(blocks);
+}
+
+/* FIX: run after DOM ready */
 document.addEventListener("DOMContentLoaded", function () {
   loadGuide();
 });
 </script>
-
-</body>
-</html>
