@@ -149,7 +149,7 @@
     switch (type) {
       case 'header':  return { level: 2, text: 'Section Title', align: 'left' };
       case 'text':    return { html: '<p>Enter your text here...</p>', align: 'left' };
-      case 'image':   return { url: '', caption: '', width: '100%' };
+      case 'image':   return {url:'',caption:'',width:'100%'};
       case 'video':   return { youtube: '', url: '' };
       case 'table':   return { headers: ['Column 1', 'Column 2', 'Column 3'], rows: [['', '', ''], ['', '', '']] };
       case 'list':    return { items: ['Item 1', 'Item 2', 'Item 3'], ordered: false };
