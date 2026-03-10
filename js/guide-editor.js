@@ -1007,5 +1007,16 @@
     setTimeout(function () { toast.classList.add('show'); }, 10);
     setTimeout(function () { toast.classList.remove('show'); }, 3000);
   }
+   
+   // slug ----อัตโนมัติ----
+   function createSlug(title){
+
+   return title
+   .toLowerCase()
+   .trim()
+   .replace(/[^\w\s-]/g,'')
+   .replace(/\s+/g,'-')
+
+}
 
 })();
