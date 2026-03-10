@@ -13,20 +13,25 @@ var GuideAPI = (function () {
   // GUIDES CRUD
   // ============================================================
 
-  async function fetchAllGuides(statusFilter) {
-    var client = _client();
-    if (!client) return [];
-    var query = client.from('guides').select('*').order('created_at', { ascending: false });
-    if (statusFilter) {
-      query = query.eq('status', statusFilter);
-    }
-    var result = await query;
-    if (result.error) {
-      console.error('[GuideAPI] fetchAllGuides error:', result.error.message);
-      return [];
-    }
-    return result.data || [];
+async function fetchAllGuides(statusFilter) {
+  var client = _client();
+  if (!client) return [];
+
+  var query = client
+    .from('guides')
+    .select('*')
+    .eq('status', statusFilter || 'published')
+    .order('created_at', { ascending: false });
+
+  var result = await query;
+
+  if (result.error) {
+    console.error('[GuideAPI] fetchAllGuides error:', result.error.message);
+    return [];
   }
+
+  return result.data || [];
+}
 
   async function fetchGuideBySlug(slug) {
     var client = _client();
