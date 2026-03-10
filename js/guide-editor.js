@@ -878,6 +878,10 @@ if (!title) {
 }
 
 var slug = createSlug(title);
+
+if(!slug){
+slug = 'guide-' + Date.now();
+}
     var guideData = {
       title: title,
       slug: slug,
