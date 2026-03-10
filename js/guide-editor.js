@@ -457,7 +457,7 @@
     var html = '';
 
     if (c.url) {
-      html += '<div class="editor-upload-preview"><img src="' + c.url + '" style="max-width:100%;border-radius:8px;"></div>';
+      html += '<div class="editor-upload-preview"><img src="' + c.url + '" style="width:'+ (c.width || '100%') +';border-radius:8px;"></div>';
       html += '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;">' +
         '<input type="text" class="img-url-input" value="' + escapeAttr(c.url) + '" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--dark3);color:var(--text);font-size:13px;">' +
         '<label class="btn btn-outline" style="padding:6px 14px;cursor:pointer;font-size:12px;margin:0;">Change<input type="file" class="img-file-input" accept="image/*" style="display:none;"></label>' +
