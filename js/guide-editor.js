@@ -463,6 +463,19 @@
         '<label class="btn btn-outline" style="padding:6px 14px;cursor:pointer;font-size:12px;margin:0;">Change<input type="file" class="img-file-input" accept="image/*" style="display:none;"></label>' +
         '</div>';
       html += '<div style="margin-top:8px;"><input type="text" class="img-caption-input" placeholder="Caption (optional)" value="' + escapeAttr(c.caption || '') + '" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--dark3);color:var(--text);font-size:13px;"></div>';
+       html += '<div style="margin-top:10px;">' +
+'<label style="font-size:12px;color:var(--muted);">Image Size</label>' +
+
+'<select class="img-size-select" ' +
+'style="width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;background:var(--dark3);color:var(--text);">' +
+
+'<option value="25%" ' + (c.width==='25%'?'selected':'') + '>Small</option>' +
+'<option value="50%" ' + (c.width==='50%'?'selected':'') + '>Medium</option>' +
+'<option value="75%" ' + (c.width==='75%'?'selected':'') + '>Large</option>' +
+'<option value="100%" ' + (c.width==='100%'?'selected':'') + '>Full</option>' +
+
+'</select>' +
+'</div>';
     } else {
       html += '<div class="editor-upload-area img-upload-trigger">' +
         '<div class="editor-upload-icon">&#128247;</div>' +
@@ -475,6 +488,20 @@
     container.innerHTML = html;
 
     // Upload trigger
+     var sizeSelect = container.querySelector('.img-size-select');
+
+if (sizeSelect) {
+
+sizeSelect.addEventListener('change', function () {
+
+blocks[index].content.width = this.value;
+
+renderAllBlocks();
+scheduleAutoSave();
+
+});
+
+}
     var trigger = container.querySelector('.img-upload-trigger');
     var fileInput = container.querySelector('.img-file-input');
     if (trigger) {
