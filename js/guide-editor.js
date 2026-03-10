@@ -869,14 +869,15 @@
   async function saveGuide(status) {
     setSaveStatus('saving', 'Saving...');
 
-    var title = metaTitle.value.trim();
-    if (!title) {
-      showToast('Please enter a guide title', 'error');
-      setSaveStatus('error', 'Title required');
-      return;
-    }
+   var title = metaTitle.value.trim();
 
-    var slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+if (!title) {
+  showToast('Please enter a guide title', 'error');
+  setSaveStatus('error', 'Title required');
+  return;
+}
+
+var slug = createSlug(title);
     var guideData = {
       title: title,
       slug: slug,
@@ -1008,14 +1009,20 @@
     setTimeout(function () { toast.classList.remove('show'); }, 3000);
   }
    
-   // slug ----อัตโนมัติ----
-   function createSlug(title){
+  // ── Utilities ──
 
-   return title
-   .toLowerCase()
-   .trim()
-   .replace(/[^\w\s-]/g,'')
-   .replace(/\s+/g,'-')
+function generateTempId() {
+  return 'tmp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+}
+
+// SLUG GENERATOR
+function createSlug(title){
+
+  return title
+  .toLowerCase()
+  .trim()
+  .replace(/[^\w\s-]/g,'')
+  .replace(/\s+/g,'-')
 
 }
 
