@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guides - 7DS Origin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar-auth.css?v=20260308">
+  <link rel="stylesheet" href="css/guide-cms.css?v=20260310">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-logo">7DS<span>Origin</span></a>
+    <div class="navbar-hamburger" id="navHam" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+    <ul class="navbar-links" id="navLinks">
+      <li><a href="index.html">&#127968; Home</a></li>
+      <li><a href="characters.html">&#9876; Characters</a></li>
+      <li><a href="tierlist.html">&#127942; Tier List</a></li>
+      <li><a href="events.html">&#127881; Events</a></li>
+      <li><a href="guides.html" class="active">&#128218; Guides</a></li>
+    </ul>
+  </nav>
+
+  <!-- PAGE CONTENT -->
+  <div class="page-content">
+    <div class="container">
+
+      <!-- Header -->
+      <div class="guides-header">
+        <h1 class="section-title">Guides</h1>
+        <div class="section-divider"></div>
+        <p class="guides-header-desc">Comprehensive guides to help you master 7DS Origin. From beginner tips to advanced strategies.</p>
+      </div>
+
+      <!-- Admin bar (visible only when logged in) -->
+      <div class="guides-admin-bar" id="guidesAdminBar" style="display:none;">
+        <a href="guide-editor.html" class="btn btn-gold">+ New Guide</a>
+      </div>
+
+      <!-- Category filter -->
+      <div class="guides-filter-bar" id="guidesFilterBar">
+        <button class="guides-filter-btn active" data-filter="all">All</button>
+        <button class="guides-filter-btn" data-filter="newbie">Newbie</button>
+        <button class="guides-filter-btn" data-filter="general">General</button>
+        <button class="guides-filter-btn" data-filter="character">Character</button>
+        <button class="guides-filter-btn" data-filter="farming">Farming</button>
+        <button class="guides-filter-btn" data-filter="advanced">Advanced</button>
+      </div>
+
+      <!-- Guides container -->
+      <div id="guidesContainer">
+        <!-- Skeleton loaders -->
+        <div class="guides-grid" id="guidesSkeleton">
+          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>7DS Origin Database &mdash; Fan-made site &mdash; Not affiliated with Netmarble</p>
+    <p style="margin-top:8px;">
+      <a href="index.html">Home</a> &nbsp;&bull;&nbsp;
+      <a href="characters.html">Characters</a> &nbsp;&bull;&nbsp;
+      <a href="tierlist.html">Tier List</a> &nbsp;&bull;&nbsp;
+      <a href="events.html">Events</a> &nbsp;&bull;&nbsp;
+      <a href="guides.html">Guides</a>
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/supabase-guide-api.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/navbar.js?v=20260308"></script>
+  <script>
+    /* ── i18n ── */
+    if (typeof I18n !== 'undefined') { I18n.init(); I18n.applyTranslations(); }
+
+    /* ── Load Guides ── */
+    var currentFilter = 'all';
+
+    async function loadGuides() {
+      var container = document.getElementById('guidesContainer');
+      var skeleton = document.getElementById('guidesSkeleton');
+
+      // Check admin
+      var isAdmin = false;
+      try { isAdmin = await Auth.isLoggedIn(); } catch(e) {}
+      if (isAdmin) {
+        document.getElementById('guidesAdminBar').style.display = 'flex';
+      }
+
+      // Fetch guides
+      var guides = await GuideAPI.fetchAllGuides(isAdmin ? null : 'published');
+
+      // Remove skeleton
+      if (skeleton) skeleton.remove();
+
+      if (!guides || guides.length === 0) {
+        container.innerHTML =
+          '<div class="guides-empty">' +
+            '<div class="guides-empty-icon">&#128218;</div>' +
+            '<div class="guides-empty-text">No guides available yet.</div>' +
+          '</div>';
+        return;
+      }
+
+      renderGuides(guides);
+    }
+
+    function renderGuides(guides) {
+      var container = document.getElementById('guidesContainer');
+      var filtered = currentFilter === 'all' ? guides : guides.filter(function(g) {
+        return g.category === currentFilter;
+      });
+
+      // Group by category
+      var categories = {};
+      filtered.forEach(function(g) {
+        var cat = g.category || 'general';
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(g);
+      });
+
+      var html = '';
+      var catOrder = ['newbie', 'general', 'character', 'farming', 'advanced'];
+
+      // If filter is not 'all', just show flat grid
+      if (currentFilter !== 'all') {
+        html += '<div class="guides-grid">';
+        filtered.forEach(function(g) {
+          html += renderGuideCard(g);
+        });
+        html += '</div>';
+      } else {
+        catOrder.forEach(function(cat) {
+          if (categories[cat] && categories[cat].length > 0) {
+            var catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
+            html += '<div class="guides-category-title">' + catLabel + ' Guides</div>';
+            html += '<div class="guides-grid">';
+            categories[cat].forEach(function(g) {
+              html += renderGuideCard(g);
+            });
+            html += '</div>';
+          }
+        });
+        // Any remaining categories
+        Object.keys(categories).forEach(function(cat) {
+          if (catOrder.indexOf(cat) === -1 && categories[cat].length > 0) {
+            var catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
+            html += '<div class="guides-category-title">' + catLabel + ' Guides</div>';
+            html += '<div class="guides-grid">';
+            categories[cat].forEach(function(g) {
+              html += renderGuideCard(g);
+            });
+            html += '</div>';
+          }
+        });
+      }
+
+      if (filtered.length === 0) {
+        html = '<div class="guides-empty">' +
+          '<div class="guides-empty-icon">&#128218;</div>' +
+          '<div class="guides-empty-text">No guides in this category.</div>' +
+        '</div>';
+      }
+
+      container.innerHTML = html;
+
+      // Store guides for filtering
+      window._allGuides = guides;
+    }
+
+    function renderGuideCard(g) {
+      var cover = g.cover_image || 'images/guides/default.jpg';
+      var slug = encodeURIComponent(g.slug);
+      var statusBadge = '';
+      if (g.status === 'draft') {
+        statusBadge = '<span style="background:rgba(239,68,68,0.2);color:#ef4444;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:8px;">DRAFT</span>';
+      }
+      return '<a href="guide.html?slug=' + slug + '" class="guide-card">' +
+        '<img src="' + cover + '" alt="" class="guide-card-thumb" onerror="this.src=\'images/guides/default.jpg\'">' +
+        '<div class="guide-card-body">' +
+          '<div class="guide-card-category">' + (g.category || 'general') + '</div>' +
+          '<div class="guide-card-title">' + g.title + statusBadge + '</div>' +
+          '<div class="guide-card-desc">' + (g.description || '') + '</div>' +
+        '</div>' +
+        '<div class="guide-card-arrow">&#8594;</div>' +
+      '</a>';
+    }
+
+    /* ── Filter buttons ── */
+    document.getElementById('guidesFilterBar').addEventListener('click', function(e) {
+      var btn = e.target.closest('.guides-filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.guides-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      if (window._allGuides) {
+        renderGuides(window._allGuides);
+      }
+    });
+
+    /* ── Init ── */
+    loadGuides();
+  </script>
+
+</body>
+</html>
