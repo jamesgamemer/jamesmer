@@ -164,8 +164,9 @@ async function loadGuide() {
   contentArea.innerHTML = GuideRenderer.renderBlocks(blocks);
 }
 
-/* FIX: run after DOM ready */
+
 document.addEventListener("DOMContentLoaded", function () {
-  loadGuide();
+  loadGuides();
 });
+
 </script>
