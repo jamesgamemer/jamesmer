@@ -103,7 +103,7 @@
       }
 
       // Fetch guides
-      var guides = await GuideAPI.fetchAllGuides(isAdmin ? null : 'published');
+  var guides = await GuideAPI.fetchAllGuides();
 
       // Remove skeleton
       if (skeleton) skeleton.remove();
