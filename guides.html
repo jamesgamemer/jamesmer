@@ -1,225 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guides - 7DS Origin</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/navbar-auth.css?v=20260308">
-  <link rel="stylesheet" href="css/guide-cms.css?v=20260310">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Guide - 7DS Origin</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/navbar-auth.css?v=20260308">
+<link rel="stylesheet" href="css/guide-cms.css?v=20260310">
 </head>
+
+
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="index.html" class="navbar-logo">7DS<span>Origin</span></a>
-    <div class="navbar-hamburger" id="navHam" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </div>
-    <ul class="navbar-links" id="navLinks">
-      <li><a href="index.html">&#127968; Home</a></li>
-      <li><a href="characters.html">&#9876; Characters</a></li>
-      <li><a href="tierlist.html">&#127942; Tier List</a></li>
-      <li><a href="events.html">&#127881; Events</a></li>
-      <li><a href="guides.html" class="active">&#128218; Guides</a></li>
-    </ul>
-  </nav>
+<!-- NAVBAR -->
+<nav class="navbar">
 
-  <!-- PAGE CONTENT -->
-  <div class="page-content">
-    <div class="container">
+<a href="index.html" class="navbar-logo">
+7DS<span>Origin</span>
+</a>
 
-      <!-- Header -->
-      <div class="guides-header">
-        <h1 class="section-title">Guides</h1>
-        <div class="section-divider"></div>
-        <p class="guides-header-desc">Comprehensive guides to help you master 7DS Origin. From beginner tips to advanced strategies.</p>
-      </div>
+<div class="navbar-hamburger" id="navHam">
+<span></span>
+<span></span>
+<span></span>
+</div>
 
-      <!-- Admin bar (visible only when logged in) -->
-      <div class="guides-admin-bar" id="guidesAdminBar" style="display:none;">
-        <a href="guide-editor.html" class="btn btn-gold">+ New Guide</a>
-      </div>
+<ul class="navbar-links" id="navLinks">
 
-      <!-- Category filter -->
-      <div class="guides-filter-bar" id="guidesFilterBar">
-        <button class="guides-filter-btn active" data-filter="all">All</button>
-        <button class="guides-filter-btn" data-filter="newbie">Newbie</button>
-        <button class="guides-filter-btn" data-filter="general">General</button>
-        <button class="guides-filter-btn" data-filter="character">Character</button>
-        <button class="guides-filter-btn" data-filter="farming">Farming</button>
-        <button class="guides-filter-btn" data-filter="advanced">Advanced</button>
-      </div>
+<li>
+<a href="index.html">🏠 Home</a>
+</li>
 
-      <!-- Guides container -->
-      <div id="guidesContainer">
-        <!-- Skeleton loaders -->
-        <div class="guides-grid" id="guidesSkeleton">
-          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
-          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
-          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
-          <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
-        </div>
-      </div>
+<li>
+<a href="characters.html">⚔ Characters</a>
+</li>
 
-    </div>
-  </div>
+<li>
+<a href="tierlist.html">🏆 Tier List</a>
+</li>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <p>7DS Origin Database &mdash; Fan-made site &mdash; Not affiliated with Netmarble</p>
-    <p style="margin-top:8px;">
-      <a href="index.html">Home</a> &nbsp;&bull;&nbsp;
-      <a href="characters.html">Characters</a> &nbsp;&bull;&nbsp;
-      <a href="tierlist.html">Tier List</a> &nbsp;&bull;&nbsp;
-      <a href="events.html">Events</a> &nbsp;&bull;&nbsp;
-      <a href="guides.html">Guides</a>
-    </p>
-  </footer>
+<li>
+<a href="events.html">🎉 Events</a>
+</li>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-config.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/supabase-guide-api.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/navbar.js?v=20260308"></script>
-  <script>
-    /* ── i18n ── */
-    if (typeof I18n !== 'undefined') { I18n.init(); I18n.applyTranslations(); }
+<li>
+<a href="guides.html" class="active">📚 Guides</a>
+</li>
 
-    /* ── Load Guides ── */
-    var currentFilter = 'all';
+</ul>
 
-    async function loadGuides() {
-      var container = document.getElementById('guidesContainer');
-      var skeleton = document.getElementById('guidesSkeleton');
+</nav>
 
-      // Check admin
-      var isAdmin = false;
-      try { isAdmin = await Auth.isLoggedIn(); } catch(e) {}
-      if (isAdmin) {
-        document.getElementById('guidesAdminBar').style.display = 'flex';
-      }
 
-      // Fetch guides
- var guides = await GuideAPI.fetchAllGuides();
 
-console.log("Guides fetched:", guides);
+<!-- PAGE -->
+<div class="page-content">
 
-      // Remove skeleton
-      if (skeleton) skeleton.remove();
+<div class="container">
 
-      if (!guides || guides.length === 0) {
-        container.innerHTML =
-          '<div class="guides-empty">' +
-            '<div class="guides-empty-icon">&#128218;</div>' +
-            '<div class="guides-empty-text">No guides available yet.</div>' +
-          '</div>';
-        return;
-      }
+<a href="guides.html" class="guide-back-link">
+← Back to Guides
+</a>
 
-      renderGuides(guides, isAdmin);
-    }
 
-    function renderGuides(guides) {
-      var container = document.getElementById('guidesContainer');
-      var filtered = currentFilter === 'all' ? guides : guides.filter(function(g) {
-        return (g.category || '').toLowerCase().trim() === currentFilter;
-      });
+<!-- HEADER -->
+<div class="guide-detail-header" id="guideHeader">
 
-      // Group by category
-      var categories = {};
-      filtered.forEach(function(g) {
-        var cat = (g.category || 'general').toLowerCase().trim();
-        if (!categories[cat]) categories[cat] = [];
-        categories[cat].push(g);
-      });
+<div class="skeleton"
+style="width:100%;height:200px;margin-bottom:16px;border-radius:16px;">
+</div>
 
-      var html = '';
-      var catOrder = Object.keys(categories);
+<div class="skeleton"
+style="width:60%;height:32px;margin-bottom:8px;">
+</div>
 
-      // If filter is not 'all', just show flat grid
-      if (currentFilter !== 'all') {
-        html += '<div class="guides-grid">';
-        filtered.forEach(function(g) {
-          html += renderGuideCard(g);
-        });
-        html += '</div>';
-      } else {
-        catOrder.forEach(function(cat) {
-          if (categories[cat] && categories[cat].length > 0) {
-            var catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
-            html += '<div class="guides-category-title">' + catLabel + ' Guides</div>';
-            html += '<div class="guides-grid">';
-            categories[cat].forEach(function(g) {
-              html += renderGuideCard(g);
-            });
-            html += '</div>';
-          }
-        });
-        // Any remaining categories
-        Object.keys(categories).forEach(function(cat) {
-          if (catOrder.indexOf(cat) === -1 && categories[cat].length > 0) {
-            var catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
-            html += '<div class="guides-category-title">' + catLabel + ' Guides</div>';
-            html += '<div class="guides-grid">';
-            categories[cat].forEach(function(g) {
-              html += renderGuideCard(g);
-            });
-            html += '</div>';
-          }
-        });
-      }
+<div class="skeleton"
+style="width:40%;height:16px;">
+</div>
 
-      if (filtered.length === 0) {
-        html = '<div class="guides-empty">' +
-          '<div class="guides-empty-icon">&#128218;</div>' +
-          '<div class="guides-empty-text">No guides in this category.</div>' +
-        '</div>';
-      }
+</div>
 
-      container.innerHTML = html;
 
-      // Store guides for filtering
-      window._allGuides = guides;
-    }
+<!-- ADMIN ACTIONS -->
+<div id="guideAdminActions"
+style="display:none;margin-bottom:20px;">
 
-    function renderGuideCard(g) {
-      var cover = g.cover_image || 'images/guides/default.jpg';
-      var slug = encodeURIComponent(g.slug);
-      var statusBadge = '';
-      if (g.status === 'draft') {
-        statusBadge = '<span style="background:rgba(239,68,68,0.2);color:#ef4444;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:8px;">DRAFT</span>';
-      }
-      return '<a href="guide.html?slug=' + slug + '" class="guide-card">' +
-        '<img src="' + cover + '" alt="" class="guide-card-thumb" onerror="this.src=\'images/guides/default.jpg\'">' +
-        '<div class="guide-card-body">' +
-          '<div class="guide-card-category">' + (g.category || 'general') + '</div>' +
-          '<div class="guide-card-title">' + g.title + statusBadge + '</div>' +
-          '<div class="guide-card-desc">' + (g.description || '') + '</div>' +
-        '</div>' +
-        '<div class="guide-card-arrow">&#8594;</div>' +
-      '</a>';
-    }
+<a id="editGuideBtn"
+href="#"
+class="btn btn-gold">
 
-    /* ── Filter buttons ── */
-    document.getElementById('guidesFilterBar').addEventListener('click', function(e) {
-      var btn = e.target.closest('.guides-filter-btn');
-      if (!btn) return;
-      document.querySelectorAll('.guides-filter-btn').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      if (window._allGuides) {
-        renderGuides(window._allGuides);
-      }
-    });
+✎ Edit Guide
 
-    /* ── Init ── */
-  document.addEventListener("DOMContentLoaded", function () {
-  loadGuides();
-});
-  </script>
+</a>
+
+<button
+id="deleteGuideBtn"
+class="btn btn-outline"
+style="border-color:#ef4444;color:#ef4444;margin-left:8px;">
+
+🗑 Delete
+
+</button>
+
+</div>
+
+
+<!-- GUIDE CONTENT -->
+<div class="guide-content-area" id="guideContent">
+
+<div
+style="text-align:center;padding:40px;color:var(--muted);">
+
+Loading guide content...
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- FOOTER -->
+<footer class="site-footer">
+
+<p>
+7DS Origin Database — Fan-made site — Not affiliated with Netmarble
+</p>
+
+<p style="margin-top:8px;">
+
+<a href="index.html">Home</a> •
+
+<a href="characters.html">Characters</a> •
+
+<a href="tierlist.html">Tier List</a> •
+
+<a href="events.html">Events</a> •
+
+<a href="guides.html">Guides</a>
+
+</p>
+
+</footer>
+
+
+
+<!-- SCRIPTS -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/supabase-guide-api.js"></script>
+<script src="js/guide-renderer.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/navbar.js?v=20260308"></script>
+
+
+<script>
+
+/* ================================
+   I18N
+================================ */
+
+if (typeof I18n !== 'undefined') {
+
+I18n.init();
+I18n.applyTranslations();
+
+}
+
+
+/* ================================
+   GET SLUG
+================================ */
+
+var params = new URLSearchParams(window.location.search);
+var slug = params.get('slug');
+
+
+/* ================================
+   LOAD GUIDE
+================================ */
+
+async function loadGuide(){
+
+var header = document.getElementById('guideHeader');
+var content = document.getElementById('guideContent');
+
+if(!header || !content) return;
+
+
+/* NO SLUG */
+
+if(!slug){
+
+header.innerHTML =
+'<h1 class="guide-detail-title">Guide not found</h1>';
+
+content.innerHTML =
+'<p style="color:var(--muted);">No guide slug provided.</p>';
+
+return;
+
+}
+
+
+/* FETCH GUIDE */
+
+var guide = await GuideAPI.fetchGuideBySlug(slug);
+
+if(!guide){
+
+header.innerHTML =
+'<h1 class="guide-detail-title">Guide not found</h1>';
+
+content.innerHTML =
+'<p style="color:var(--muted);">Guide does not exist.</p>';
+
+return;
+
+}
+
+
+/* PAGE TITLE */
+
+document.title = guide.title + ' - 7DS Origin';
+
+
+/* ================================
+   RENDER HEADER
+================================ */
+
+var html = "";
+
+if(guide.cover_image){
+
+html +=
+'<img src="'+guide.cover_image+'" class="guide-detail-cover" onerror="this.style.display=\'none\'">';
+
+}
+
+html += '<div class="guide-detail-meta">';
+
+html +=
+'<span class="guide-detail-category">'+
+(guide.category || 'general')+
+'</span>';
+
+html +=
+'<span class="guide-detail-date">Updated: '+
+new Date(guide.updated_at).toLocaleDateString()+
+'</span>';
+
+html += '</div>';
+
+html +=
+'<h1 class="guide-detail-title">'+
+guide.title+
+'</h1>';
+
+if(guide.description){
+
+html +=
+'<p class="guide-detail-desc">'+
+guide.description+
+'</p>';
+
+}
+
+header.innerHTML = html;
+
+
+/* ================================
+   ADMIN CONTROLS
+================================ */
+
+var isAdmin = false;
+
+try{
+
+isAdmin = await Auth.isLoggedIn();
+
+}catch(e){}
+
+
+if(isAdmin){
+
+document.getElementById('guideAdminActions').style.display = "block";
+
+document.getElementById('editGuideBtn').href =
+'guide-editor.html?id=' + guide.id;
+
+document.getElementById('deleteGuideBtn').onclick =
+async function(){
+
+if(!confirm("Delete this guide?")) return;
+
+await GuideAPI.deleteGuide(guide.id);
+
+window.location.href = "guides.html";
+
+}
+
+}
+
+
+/* ================================
+   LOAD BLOCKS
+================================ */
+
+var blocks = await GuideAPI.fetchBlocks(guide.id);
+
+if(!blocks || blocks.length === 0){
+
+content.innerHTML =
+'<p style="color:var(--muted);text-align:center;padding:40px;">This guide has no content yet.</p>';
+
+return;
+
+}
+
+
+/* ================================
+   RENDER BLOCKS
+================================ */
+
+content.innerHTML =
+GuideRenderer.renderBlocks(blocks);
+
+}
+
+
+/* ================================
+   START
+================================ */
+
+document.addEventListener("DOMContentLoaded", loadGuide);
+
+</script>
+
 
 </body>
 </html>
