@@ -49,15 +49,22 @@ var GuideRenderer = (function () {
   }
 
   function renderImage(c) {
-    var src = c.url || c.src || '';
-    var caption = c.caption || '';
-    var width = c.width || '100%';
-    var html = '<div class="gb-block gb-image">';
-    html += '<img src="' + src + '" alt="' + caption + '" style="max-width:' + width + '" loading="lazy">';
-    if (caption) html += '<div class="gb-image-caption">' + caption + '</div>';
-    html += '</div>';
-    return html;
-  }
+
+var src = c.url || c.src || '';
+var caption = c.caption || '';
+var width = c.width || '100%';
+
+var html = '<div class="gb-block gb-image">';
+
+html += '<img src="' + src + '" alt="' + caption + '" style="width:' + width + ';max-width:100%" loading="lazy">';
+
+if (caption) html += '<div class="gb-image-caption">' + caption + '</div>';
+
+html += '</div>';
+
+return html;
+
+}
 
   function renderVideo(c) {
     var html = '<div class="gb-block">';
