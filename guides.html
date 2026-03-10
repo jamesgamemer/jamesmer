@@ -103,7 +103,9 @@
       }
 
       // Fetch guides
-  var guides = await GuideAPI.fetchAllGuides();
+  var guides = await GuideAPI.fetchAllGuides(isAdmin ? null : 'published');
+
+console.log("Guides fetched:", guides);
 
       // Remove skeleton
       if (skeleton) skeleton.remove();
@@ -214,7 +216,9 @@
     });
 
     /* ── Init ── */
-    loadGuides();
+  document.addEventListener("DOMContentLoaded", function () {
+  loadGuides();
+});
   </script>
 
 </body>
